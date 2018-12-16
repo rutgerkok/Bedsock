@@ -1,4 +1,4 @@
-package nl.rutgerkok.bedsock;
+package nl.rutgerkok.bedsock.impl;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -22,7 +22,6 @@ public class ConsoleReadThread extends Thread {
         while (true) {
             try {
                 String command = console.readLine() + System.lineSeparator();
-                System.out.println("Running command: " + command);
                 commandSender.write(command);
                 commandSender.flush();
             } catch (IOException e) {
