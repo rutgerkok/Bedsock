@@ -35,6 +35,17 @@ public class StartServer implements Callable<Void> {
         processBuilder.directory(file.getParentFile());
         processBuilder.redirectErrorStream(true);
         Process process = processBuilder.start();
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                if (process.isAlive()) {
+                    logger.warning(
+                            "Wrapper was forcibly closed, but Bedrock server was still active. Closing it now...");
+                    process.destroyForcibly();
+                }
+            }
+        });
+
         InputStream outputOfProcess = process.getInputStream();
         OutputStream commandSender = process.getOutputStream();
 
