@@ -18,13 +18,19 @@ final class PrintlnLogger implements SockLogger {
     }
 
     @Override
-    public void info(String message) {
-        System.out.print("[Info] " + message);
+    public void error(String message) {
+        System.err.println("[Severe]" + message);
     }
 
     @Override
-    public void error(String message) {
-        System.err.println("[Severe]" + message);
+    public void error(String message, Throwable e) {
+        error(message);
+        e.printStackTrace();
+    }
+
+    @Override
+    public void info(String message) {
+        System.out.print("[Info] " + message);
     }
 
     @Override

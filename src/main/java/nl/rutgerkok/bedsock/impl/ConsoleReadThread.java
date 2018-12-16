@@ -4,29 +4,36 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
+import java.util.Objects;
+
+import nl.rutgerkok.bedsock.SockLogger;
+import nl.rutgerkok.bedsock.command.CommandException;
+import nl.rutgerkok.bedsock.command.CommandRunner;
 
 public class ConsoleReadThread extends Thread {
 
     private final BufferedReader console;
-    private final OutputStreamWriter commandSender;
+    private final CommandRunner commandRunner;
+    private final SockLogger logger;
 
-    public ConsoleReadThread(InputStream console, OutputStream commandSender) {
+    public ConsoleReadThread(InputStream console, CommandRunner commandRunner, SockLogger logger) {
         this.console = new BufferedReader(new InputStreamReader(console));
-        this.commandSender = new OutputStreamWriter(commandSender);
+        this.commandRunner = Objects.requireNonNull(commandRunner, "commandRunner");
+        this.logger = Objects.requireNonNull(logger, "logger");
     }
 
     @Override
     public void run() {
         while (true) {
             try {
-                String command = console.readLine() + System.lineSeparator();
-                commandSender.write(command);
-                commandSender.flush();
+                String command = console.readLine();
+                if (command != null && !command.isEmpty()) {
+                    commandRunner.runCommand(command);
+                }
+            } catch (CommandException e) {
+                logger.error("Error running command: " + e.getMessage());
             } catch (IOException e) {
-                System.out.println("Failed to send command");
-                e.printStackTrace();
+                logger.error("Error reading command", e);
             }
         }
     }
