@@ -1,5 +1,8 @@
 package nl.rutgerkok.bedsock.impl;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import nl.rutgerkok.bedsock.SockLogger;
 
 /**
@@ -7,19 +10,11 @@ import nl.rutgerkok.bedsock.SockLogger;
  */
 final class PrintlnLogger implements SockLogger {
 
+    private SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+
     @Override
     public void chat(String name, String message) {
         System.out.println("[Sock] " + name + ": " + message);
-    }
-
-    @Override
-    public void debug(String message) {
-        System.out.println("[Debug] " + message);
-    }
-
-    @Override
-    public void error(String message) {
-        System.err.println("[Severe]" + message);
     }
 
     @Override
@@ -29,13 +24,9 @@ final class PrintlnLogger implements SockLogger {
     }
 
     @Override
-    public void info(String message) {
-        System.out.print("[Info] " + message);
+    public void log(LogLevel level, String message) {
+        System.out.println("[" + timeFormat.format(new Date()) + " " + level.name() + "] " + message);
     }
 
-    @Override
-    public void warning(String message) {
-        System.out.println("[Warning] " + message);
-    }
 
 }

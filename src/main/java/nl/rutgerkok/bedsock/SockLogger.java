@@ -3,6 +3,13 @@ package nl.rutgerkok.bedsock;
 public interface SockLogger {
 
     /**
+     * The level at which a message is logged.
+     */
+    enum LogLevel {
+        INFO, DEBUG, ERROR, WARNING
+    }
+
+    /**
      * Logs a chat message.
      *
      * @param name
@@ -18,7 +25,9 @@ public interface SockLogger {
      * @param message
      *            The message.
      */
-    void debug(String message);
+    default void debug(String message) {
+        log(LogLevel.DEBUG, message);
+    }
 
     /**
      * Logs an error.
@@ -26,7 +35,9 @@ public interface SockLogger {
      * @param message
      *            The error message.
      */
-    void error(String message);
+    default void error(String message) {
+        log(LogLevel.ERROR, message);
+    }
 
     /**
      * Logs an error with a strack trace.
@@ -44,11 +55,22 @@ public interface SockLogger {
      * @param message
      *            The message.
      */
-    void info(String message);
+    default void info(String message) {
+        log(LogLevel.INFO, message);
+    }
+
+    /**
+     * Logs a message.
+     * @param level Level to log at.
+     * @param message The message.
+     */
+    void log(LogLevel level, String message);
 
     /**
      * Logs a warning.
      * @param message The warning message.
      */
-    void warning(String message);
+    default void warning(String message) {
+        log(LogLevel.WARNING, message);
+    }
 }

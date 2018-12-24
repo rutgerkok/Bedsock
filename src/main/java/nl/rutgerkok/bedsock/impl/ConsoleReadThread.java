@@ -10,6 +10,10 @@ import nl.rutgerkok.bedsock.SockLogger;
 import nl.rutgerkok.bedsock.command.CommandException;
 import nl.rutgerkok.bedsock.command.CommandRunner;
 
+/**
+ * This reads the commands the admin is typing.
+ *
+ */
 public class ConsoleReadThread extends Thread {
 
     private final BufferedReader console;

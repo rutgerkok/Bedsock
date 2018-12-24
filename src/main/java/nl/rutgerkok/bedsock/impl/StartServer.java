@@ -1,15 +1,14 @@
 package nl.rutgerkok.bedsock.impl;
 
+import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import nl.rutgerkok.bedsock.SockLogger;
 import nl.rutgerkok.bedsock.command.CommandException;
 import nl.rutgerkok.bedsock.command.CommandRunner;
-
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
@@ -38,7 +37,7 @@ public class StartServer implements Callable<Void> {
         processBuilder.redirectErrorStream(true);
         Process process = processBuilder.start();
 
-        InputStream outputOfProcess = process.getInputStream();
+        BufferedReader outputOfProcess = new BufferedReader(new InputStreamReader(process.getInputStream()));
         BedrockServer server = new BedrockServer(process.getOutputStream());
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -59,9 +58,9 @@ public class StartServer implements Callable<Void> {
             }
         });
 
+        BedrockReader reader = new BedrockReader(outputOfProcess, logger);
         startConsoleReadThread(server.commandRunner, logger);
-        passOutput(process, outputOfProcess);
-
+        reader.run();
         return null;
     }
 
@@ -76,16 +75,6 @@ public class StartServer implements Callable<Void> {
             return null;
         }
         return file;
-    }
-
-    private void passOutput(Process process, InputStream outputOfProcess) throws IOException {
-        byte[] buffer = new byte[256];
-        while (process.isAlive()) {
-            int length = outputOfProcess.read(buffer);
-            if (length > 0) {
-                System.out.write(buffer, 0, length);
-            }
-        }
     }
 
     private void startConsoleReadThread(CommandRunner commandRunner, SockLogger logger) {
