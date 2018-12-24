@@ -6,9 +6,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Objects;
 
-import nl.rutgerkok.bedsock.SockLogger;
+import nl.rutgerkok.bedsock.ServerWrapper;
 import nl.rutgerkok.bedsock.command.CommandException;
-import nl.rutgerkok.bedsock.command.CommandRunner;
 
 /**
  * This reads the commands the admin is typing.
@@ -17,13 +16,11 @@ import nl.rutgerkok.bedsock.command.CommandRunner;
 public class ConsoleReadThread extends Thread {
 
     private final BufferedReader console;
-    private final CommandRunner commandRunner;
-    private final SockLogger logger;
+    private final ServerWrapper server;
 
-    public ConsoleReadThread(InputStream console, CommandRunner commandRunner, SockLogger logger) {
+    public ConsoleReadThread(InputStream console, ServerWrapper server) {
         this.console = new BufferedReader(new InputStreamReader(console));
-        this.commandRunner = Objects.requireNonNull(commandRunner, "commandRunner");
-        this.logger = Objects.requireNonNull(logger, "logger");
+        this.server = Objects.requireNonNull(server, "server");
     }
 
     @Override
@@ -32,12 +29,12 @@ public class ConsoleReadThread extends Thread {
             try {
                 String command = console.readLine();
                 if (command != null && !command.isEmpty()) {
-                    commandRunner.runCommand(command);
+                    server.getCommandRunner().runCommand(command);
                 }
             } catch (CommandException e) {
-                logger.error("Error running command: " + e.getMessage());
+                server.getLogger().error("Error running command: " + e.getMessage());
             } catch (IOException e) {
-                logger.error("Error reading command", e);
+                server.getLogger().error("Error reading command", e);
             }
         }
     }

@@ -7,8 +7,8 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import nl.rutgerkok.bedsock.SockLogger;
-import nl.rutgerkok.bedsock.SockLogger.LogLevel;
+import nl.rutgerkok.bedsock.Logger;
+import nl.rutgerkok.bedsock.Logger.LogLevel;
 
 final class BedrockReader implements Closeable {
 
@@ -16,10 +16,10 @@ final class BedrockReader implements Closeable {
     private static final Pattern DATE_TIME_LEVEL = Pattern.compile("^\\[[\\d- :]+(?<level>[A-Z]+)\\] (?<message>.*)");
 
     private final BufferedReader stream;
-    private final SockLogger logger;
+    private final Logger logger;
     private volatile OutputFilter filter;
 
-    public BedrockReader(BufferedReader stream, SockLogger logger) {
+    public BedrockReader(BufferedReader stream, Logger logger) {
         this.stream = Objects.requireNonNull(stream);
         this.logger = Objects.requireNonNull(logger);
     }

@@ -6,9 +6,9 @@ import java.io.InputStreamReader;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
-import nl.rutgerkok.bedsock.SockLogger;
+import nl.rutgerkok.bedsock.Logger;
+import nl.rutgerkok.bedsock.ServerWrapper;
 import nl.rutgerkok.bedsock.command.CommandException;
-import nl.rutgerkok.bedsock.command.CommandRunner;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
@@ -25,7 +25,7 @@ public class StartServer implements Callable<Void> {
 
     @Override
     public Void call() throws Exception {
-        SockLogger logger = new PrintlnLogger();
+        Logger logger = new PrintlnLogger();
 
         File file = getExecutableFile(logger);
         if (file == null) {
@@ -38,7 +38,7 @@ public class StartServer implements Callable<Void> {
         Process process = processBuilder.start();
 
         BufferedReader outputOfProcess = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        BedrockServer server = new BedrockServer(process.getOutputStream());
+        BedrockServer server = new BedrockServer(process.getOutputStream(), logger);
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
@@ -58,13 +58,14 @@ public class StartServer implements Callable<Void> {
             }
         });
 
-        BedrockReader reader = new BedrockReader(outputOfProcess, logger);
-        startConsoleReadThread(server.commandRunner, logger);
-        reader.run();
-        return null;
+        try (BedrockReader reader = new BedrockReader(outputOfProcess, logger)) {
+            startConsoleReadThread(server);
+            reader.run();
+            return null;
+        }
     }
 
-    private File getExecutableFile(SockLogger logger) {
+    private File getExecutableFile(Logger logger) {
         File file = this.file.getAbsoluteFile();
 
         if (System.getProperty("os.name").contains("Windows") && !file.toString().endsWith(".exe")) {
@@ -77,8 +78,8 @@ public class StartServer implements Callable<Void> {
         return file;
     }
 
-    private void startConsoleReadThread(CommandRunner commandRunner, SockLogger logger) {
-        ConsoleReadThread consoleReadThread = new ConsoleReadThread(System.in, commandRunner, logger);
+    private void startConsoleReadThread(ServerWrapper server) {
+        ConsoleReadThread consoleReadThread = new ConsoleReadThread(System.in, server);
         consoleReadThread.setDaemon(true);
         consoleReadThread.start();
     }

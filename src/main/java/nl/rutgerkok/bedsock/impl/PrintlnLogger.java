@@ -3,12 +3,12 @@ package nl.rutgerkok.bedsock.impl;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import nl.rutgerkok.bedsock.SockLogger;
+import nl.rutgerkok.bedsock.Logger;
 
 /**
  * Ultra-simple logger.
  */
-final class PrintlnLogger implements SockLogger {
+final class PrintlnLogger implements Logger {
 
     private SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
 

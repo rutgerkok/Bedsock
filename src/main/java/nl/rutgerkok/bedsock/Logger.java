@@ -1,6 +1,6 @@
 package nl.rutgerkok.bedsock;
 
-public interface SockLogger {
+public interface Logger {
 
     /**
      * The level at which a message is logged.
