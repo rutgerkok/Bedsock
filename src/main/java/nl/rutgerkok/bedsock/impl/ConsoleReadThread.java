@@ -19,6 +19,7 @@ public class ConsoleReadThread extends Thread {
     private final ServerWrapper server;
 
     public ConsoleReadThread(InputStream console, ServerWrapper server) {
+        super.setName("Console reader");
         this.console = new BufferedReader(new InputStreamReader(console));
         this.server = Objects.requireNonNull(server, "server");
     }

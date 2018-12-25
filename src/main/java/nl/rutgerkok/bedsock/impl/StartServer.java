@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 import nl.rutgerkok.bedsock.Logger;
 import nl.rutgerkok.bedsock.ServerWrapper;
 import nl.rutgerkok.bedsock.command.CommandException;
+
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
@@ -58,8 +59,9 @@ public class StartServer implements Callable<Void> {
             }
         });
 
+        startConsoleReadThread(server);
         try (BedrockReader reader = new BedrockReader(outputOfProcess, logger)) {
-            startConsoleReadThread(server);
+            server.commandRunner.setOutputFilterSeter(reader::setFilter);
             reader.run();
             return null;
         }

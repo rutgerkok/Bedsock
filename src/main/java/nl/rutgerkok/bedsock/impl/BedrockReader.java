@@ -10,6 +10,10 @@ import java.util.regex.Pattern;
 import nl.rutgerkok.bedsock.Logger;
 import nl.rutgerkok.bedsock.Logger.LogLevel;
 
+/**
+ * This reads output from Minecraft.
+ *
+ */
 final class BedrockReader implements Closeable {
 
     private static final String NO_LOG_FILE = "NO LOG FILE! - ";
@@ -61,7 +65,7 @@ final class BedrockReader implements Closeable {
         }
     }
 
-    public void setFilter(OutputFilter filter) throws IllegalStateException {
+    void setFilter(OutputFilter filter) throws IllegalStateException {
         if (this.filter != null) {
             throw new IllegalStateException("Setting a filter while another one is in use");
         }
