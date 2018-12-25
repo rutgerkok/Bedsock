@@ -2,16 +2,17 @@ package nl.rutgerkok.bedsock.impl;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import nl.rutgerkok.bedsock.Logger;
-import nl.rutgerkok.bedsock.ServerWrapper;
 import nl.rutgerkok.bedsock.command.CommandException;
 
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
 @Command(description = "Starts the server wrapper", name = "start", mixinStandardHelpOptions = true, version = "0.0.1")
@@ -24,6 +25,10 @@ public class StartServer implements Callable<Void> {
     @Parameters(index = "0", description = "The file to run.", defaultValue = "bedrock_server")
     private File file;
 
+    @Option(names = {
+            "--plugin_folder" }, description = "The folder where all plugins are stored", defaultValue = "wrapper_plugins")
+    private File pluginFolder;
+
     @Override
     public Void call() throws Exception {
         Logger logger = new PrintlnLogger();
@@ -33,10 +38,7 @@ public class StartServer implements Callable<Void> {
             return null;
         }
 
-        ProcessBuilder processBuilder = new ProcessBuilder(file.toString());
-        processBuilder.directory(file.getParentFile());
-        processBuilder.redirectErrorStream(true);
-        Process process = processBuilder.start();
+        Process process = startServer(file);
 
         BufferedReader outputOfProcess = new BufferedReader(new InputStreamReader(process.getInputStream()));
         BedrockServer server = new BedrockServer(process.getOutputStream(), logger);
@@ -59,12 +61,16 @@ public class StartServer implements Callable<Void> {
             }
         });
 
-        startConsoleReadThread(server);
-        try (BedrockReader reader = new BedrockReader(outputOfProcess, logger)) {
-            server.commandRunner.setOutputFilterSeter(reader::setFilter);
-            reader.run();
-            return null;
-        }
+        ConsoleReadThread consoleReadThread = new ConsoleReadThread(System.in, server);
+        BedrockReaderThread bedrockReadThread = new BedrockReaderThread(outputOfProcess, logger);
+        consoleReadThread.setDaemon(true);
+        consoleReadThread.start();
+        bedrockReadThread.start();
+
+        server.pluginLoader.loadPlugins(pluginFolder.toPath());
+        server.pluginLoader.enablePlugins(server);
+
+        return null;
     }
 
     private File getExecutableFile(Logger logger) {
@@ -80,9 +86,11 @@ public class StartServer implements Callable<Void> {
         return file;
     }
 
-    private void startConsoleReadThread(ServerWrapper server) {
-        ConsoleReadThread consoleReadThread = new ConsoleReadThread(System.in, server);
-        consoleReadThread.setDaemon(true);
-        consoleReadThread.start();
+    private Process startServer(File file) throws IOException {
+        ProcessBuilder processBuilder = new ProcessBuilder(file.toString());
+        processBuilder.directory(file.getParentFile());
+        processBuilder.redirectErrorStream(true);
+        Process process = processBuilder.start();
+        return process;
     }
 }

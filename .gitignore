@@ -6,3 +6,6 @@ bin/
 # Maven
 target/
 dependency-reduced-pom.xml
+
+# Project
+wrapper_plugins/
