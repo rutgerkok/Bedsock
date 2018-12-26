@@ -8,7 +8,7 @@ import nl.rutgerkok.bedsock.Logger;
 /**
  * Ultra-simple logger.
  */
-final class PrintlnLogger implements Logger {
+public final class PrintlnLogger implements Logger {
 
     private SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
 
