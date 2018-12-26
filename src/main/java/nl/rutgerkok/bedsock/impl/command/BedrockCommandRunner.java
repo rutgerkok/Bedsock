@@ -1,4 +1,4 @@
-package nl.rutgerkok.bedsock.impl;
+package nl.rutgerkok.bedsock.impl.command;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -9,12 +9,13 @@ import java.util.function.Consumer;
 
 import nl.rutgerkok.bedsock.command.CommandException;
 import nl.rutgerkok.bedsock.command.CommandRunner;
+import nl.rutgerkok.bedsock.impl.OutputFilter;
 
 /**
  * Thread-safe class that passes commands directly to Minecraft.
  *
  */
-final class BedrockCommandRunner implements CommandRunner {
+public final class BedrockCommandRunner implements CommandRunner {
 
     /**
      * Collects all output until a line contains the given string.

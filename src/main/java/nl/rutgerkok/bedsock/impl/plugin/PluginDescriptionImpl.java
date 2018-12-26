@@ -6,9 +6,9 @@ import nl.rutgerkok.bedsock.plugin.PluginDescription;
 
 final class PluginDescriptionImpl implements PluginDescription {
 
-    final String mainClass;
-    final String name;
-    final String version;
+    private final String mainClass;
+    private final String name;
+    private final String version;
 
     public PluginDescriptionImpl(ConfigObject data) throws InvalidConfigException {
         mainClass = data.getString("main");

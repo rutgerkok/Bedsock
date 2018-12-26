@@ -6,7 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Objects;
 
-import nl.rutgerkok.bedsock.ServerWrapper;
+import nl.rutgerkok.bedsock.ActiveServer;
 import nl.rutgerkok.bedsock.command.CommandException;
 
 /**
@@ -16,9 +16,9 @@ import nl.rutgerkok.bedsock.command.CommandException;
 public class ConsoleReadThread extends Thread {
 
     private final BufferedReader console;
-    private final ServerWrapper server;
+    private final ActiveServer server;
 
-    public ConsoleReadThread(InputStream console, ServerWrapper server) {
+    public ConsoleReadThread(InputStream console, ActiveServer server) {
         super.setName("Console reader");
         this.console = new BufferedReader(new InputStreamReader(console));
         this.server = Objects.requireNonNull(server, "server");

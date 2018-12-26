@@ -12,11 +12,10 @@ import java.nio.file.Path;
 import java.util.IdentityHashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import nl.rutgerkok.bedsock.ServerWrapper;
+import nl.rutgerkok.bedsock.InactiveServer;
 import nl.rutgerkok.bedsock.json.InvalidConfigException;
 import nl.rutgerkok.bedsock.json.JsonConfigs;
 import nl.rutgerkok.bedsock.plugin.Plugin;
@@ -25,53 +24,19 @@ import nl.rutgerkok.bedsock.plugin.PluginException;
 
 public final class PluginLoader {
 
-    static class ActivePlugin implements AutoCloseable {
-        final PluginDescription description;
-        final URLClassLoader classLoader;
-        final Plugin plugin;
-        boolean enabled = false;
-
-        public ActivePlugin(PluginDescription description, URLClassLoader classLoader, Plugin plugin) {
-            this.description = Objects.requireNonNull(description, "description");
-            this.classLoader = Objects.requireNonNull(classLoader, "classLoader");
-            this.plugin = Objects.requireNonNull(plugin, "plugin");
-        }
-
-        @Override
-        public void close() throws PluginException {
-            try {
-                this.plugin.onDisable();
-            } catch (Throwable t) {
-                throw new PluginException(this.description, "Error disabling plugin", t);
-            } finally {
-                try {
-                    this.classLoader.close();
-                } catch (IOException e) {
-                    throw new PluginException(this.description, "Error disabling class loader", e);
-                }
-            }
-        }
-
-        public void enable(ServerWrapper server) throws PluginException {
-            PluginLogger pluginLogger = new PluginLogger(description.getName(), server.getLogger());
-            plugin.onEnable(server, pluginLogger);
-            pluginLogger.info("Plugin is enabled");
-        }
-    }
-
-    private final Map<Plugin, ActivePlugin> plugins = new IdentityHashMap<>();
+    private final Map<Plugin, ActivePluginImpl> plugins = new IdentityHashMap<>();
 
     /**
      * Enables all plugins.
      *
      * @param server
-     *            The server instance.
+     *            The server, after it has been activated.
      * @throws PluginException
      *             If enabling fails for at least a single plugin.
      */
-    public void enablePlugins(ServerWrapper server) throws PluginException {
+    public void enablePlugins(InactiveServer server) throws PluginException {
         PluginException thrown = null;
-        for (ActivePlugin activePlugin : this.plugins.values()) {
+        for (ActivePluginImpl activePlugin : this.plugins.values()) {
             if (!activePlugin.enabled) {
                 try {
                     activePlugin.enable(server);
@@ -85,7 +50,7 @@ public final class PluginLoader {
         }
     }
 
-    private void loadPlugin(Path jarFile) throws PluginException {
+    private void loadPlugin(InactiveServer server, Path jarFile) throws PluginException {
         // Create temporary description until actual one can be loaded
         PluginDescription description = () -> jarFile.getFileName().toString();
 
@@ -97,7 +62,8 @@ public final class PluginLoader {
                 URLClassLoader classLoader = new URLClassLoader(new URL[] { jarFile.toFile().toURI().toURL() },
                         ClassLoader.getSystemClassLoader());
                 Plugin plugin = (Plugin) classLoader.loadClass(description.getMainClass()).newInstance();
-                ActivePlugin activePlugin = new ActivePlugin(description, classLoader, plugin);
+                ActivePluginImpl activePlugin = new ActivePluginImpl(description, classLoader, plugin,
+                        server.getLogger());
                 this.plugins.put(plugin, activePlugin);
             } catch (InvalidConfigException e) {
                 throw new PluginException(description, "Invalid plugin description file in " + jarFile.getFileName(),
@@ -121,6 +87,8 @@ public final class PluginLoader {
      * Loads all plugins from a folder. If the folder does not exist yet, it is
      * created.
      *
+     * @param server
+     *            The server, so that plugins have access to that.
      * @param folder
      *            The folder.
      * @throws PluginException
@@ -128,7 +96,7 @@ public final class PluginLoader {
      * @throws IOException
      *             If an IO error occurs reading the directory.
      */
-    public void loadPlugins(Path folder) throws PluginException, IOException {
+    public void loadPlugins(InactiveServer server, Path folder) throws PluginException, IOException {
         if (!Files.exists(folder)) {
             Files.createDirectories(folder);
         }
@@ -136,7 +104,7 @@ public final class PluginLoader {
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(folder)) {
             for (Path file : stream) {
                 if (file.getFileName().toString().toLowerCase(Locale.ROOT).endsWith(".jar")) {
-                    loadPlugin(file);
+                    loadPlugin(server, file);
                 }
             }
         }
@@ -146,7 +114,7 @@ public final class PluginLoader {
         Throwable last = null;
         PluginDescription offender = null;
 
-        for (ActivePlugin activePlugin : this.plugins.values()) {
+        for (ActivePluginImpl activePlugin : this.plugins.values()) {
             try {
                 activePlugin.close();
             } catch (Throwable e) {
@@ -170,7 +138,7 @@ public final class PluginLoader {
      *             If the plugin throws an exception.
      */
     void unloadPlugin(Plugin plugin) throws PluginException {
-        ActivePlugin activePlugin = this.plugins.get(plugin);
+        ActivePluginImpl activePlugin = this.plugins.get(plugin);
         if (activePlugin != null) {
             try {
                 activePlugin.close();

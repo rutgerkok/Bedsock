@@ -31,26 +31,30 @@ public class StartServer implements Callable<Void> {
 
     @Override
     public Void call() throws Exception {
-        Logger logger = new PrintlnLogger();
+        InactiveServerImpl inactiveServer = new InactiveServerImpl();
+        inactiveServer.getLogger().info("Starting server wrapper...");
+        inactiveServer.pluginLoader.loadPlugins(inactiveServer, pluginFolder.toPath());
+        inactiveServer.pluginLoader.enablePlugins(inactiveServer);
 
-        File file = getExecutableFile(logger);
+        File file = getExecutableFile(inactiveServer.getLogger());
         if (file == null) {
             return null;
         }
 
+        inactiveServer.getLogger().info("Starting Bedrock server...");
         Process process = startServer(file);
 
         BufferedReader outputOfProcess = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        BedrockServer server = new BedrockServer(process.getOutputStream(), logger);
+        ActiveServerImpl server = new ActiveServerImpl(process.getOutputStream(), inactiveServer);
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
                 if (process.isAlive()) {
-                    logger.warning(
+                    server.getLogger().warning(
                             "Wrapper was forcibly closed, but Bedrock server was still active. Closing it now...");
                     try {
-                        server.commandRunner.runCommand("stop");
+                        server.getBedrockCommandRunner().runCommand("stop");
                         if (!process.waitFor(5, TimeUnit.SECONDS)) {
                             process.destroyForcibly(); // Ok, failed
                         }
@@ -62,13 +66,10 @@ public class StartServer implements Callable<Void> {
         });
 
         ConsoleReadThread consoleReadThread = new ConsoleReadThread(System.in, server);
-        BedrockReaderThread bedrockReadThread = new BedrockReaderThread(outputOfProcess, logger);
+        BedrockReaderThread bedrockReadThread = new BedrockReaderThread(outputOfProcess, server.getLogger());
         consoleReadThread.setDaemon(true);
         consoleReadThread.start();
         bedrockReadThread.start();
-
-        server.pluginLoader.loadPlugins(pluginFolder.toPath());
-        server.pluginLoader.enablePlugins(server);
 
         return null;
     }

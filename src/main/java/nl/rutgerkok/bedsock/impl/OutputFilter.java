@@ -1,10 +1,10 @@
 package nl.rutgerkok.bedsock.impl;
 
-interface OutputFilter {
+public interface OutputFilter {
 
     /**
      * Parses a line of text.
-     * 
+     *
      * @param line
      * @return True if more lines should be passed to this filter, false otherwise.
      */
