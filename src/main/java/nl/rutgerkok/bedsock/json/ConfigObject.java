@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.eclipse.jdt.annotation.Nullable;
+
 /**
  * A map that can store ints, floats, bools, strings, arrays and other JSON
  * objects.
@@ -12,7 +14,7 @@ import java.util.Map;
  */
 public final class ConfigObject {
 
-    static String getTypeOf(Object value) {
+    static String getTypeOf(@Nullable Object value) {
         if (value == null) {
             return "null";
         }

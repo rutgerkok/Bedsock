@@ -7,6 +7,8 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+import org.eclipse.jdt.annotation.Nullable;
+
 import nl.rutgerkok.bedsock.command.CommandException;
 import nl.rutgerkok.bedsock.command.CommandRunner;
 import nl.rutgerkok.bedsock.impl.OutputFilter;
@@ -48,7 +50,7 @@ public final class BedrockCommandRunner implements CommandRunner {
     private final Object lock = new Object();
     private final OutputStreamWriter serverStdIn;
 
-    private Consumer<OutputFilter> outputFilterSetter;
+    private @Nullable Consumer<OutputFilter> outputFilterSetter;
 
     public BedrockCommandRunner(OutputStream serverStdIn) {
         this.serverStdIn = new OutputStreamWriter(serverStdIn);
@@ -59,7 +61,6 @@ public final class BedrockCommandRunner implements CommandRunner {
         // Run a two commands - the requested command, an a non-existing command.
         // When we detect that the non-existing command is running, we know that the
         // output of the first command has ended
-
         try {
             synchronized (lock) {
                 Consumer<OutputFilter> outputFilterSetter = this.outputFilterSetter;
@@ -69,7 +70,8 @@ public final class BedrockCommandRunner implements CommandRunner {
 
                 String fakeCommand = NON_EXISTING_COMMAND + UUID.randomUUID();
                 RecordingOutputFilter filter = new RecordingOutputFilter(fakeCommand);
-                this.outputFilterSetter.accept(filter);
+
+                outputFilterSetter.accept(filter);
                 serverStdIn.write(command + System.lineSeparator() + fakeCommand + System.lineSeparator());
                 serverStdIn.flush();
                 while (!filter.done) {

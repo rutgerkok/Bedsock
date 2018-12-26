@@ -1,7 +1,7 @@
 /**
- * For running commands on the server.
+ * Various utility methods.
  */
 @NonNullByDefault
-package nl.rutgerkok.bedsock.command;
+package nl.rutgerkok.bedsock.util;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;

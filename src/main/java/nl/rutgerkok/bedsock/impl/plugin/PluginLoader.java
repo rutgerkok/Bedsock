@@ -1,5 +1,7 @@
 package nl.rutgerkok.bedsock.impl.plugin;
 
+import static nl.rutgerkok.bedsock.util.NullAnnotation.nonNull;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -61,7 +63,7 @@ public final class PluginLoader {
                 description = new PluginDescriptionImpl(JsonConfigs.loadFromReader(reader));
                 URLClassLoader classLoader = new URLClassLoader(new URL[] { jarFile.toFile().toURI().toURL() },
                         ClassLoader.getSystemClassLoader());
-                Plugin plugin = (Plugin) classLoader.loadClass(description.getMainClass()).newInstance();
+                Plugin plugin = nonNull((Plugin) classLoader.loadClass(description.getMainClass()).newInstance());
                 ActivePluginImpl activePlugin = new ActivePluginImpl(description, classLoader, plugin,
                         server.getLogger());
                 this.plugins.put(plugin, activePlugin);
@@ -124,7 +126,7 @@ public final class PluginLoader {
             }
         }
         this.plugins.clear();
-        if (last != null) {
+        if (last != null && offender != null) {
             throw new PluginException(offender, "Error disabling plugin", last);
         }
     }

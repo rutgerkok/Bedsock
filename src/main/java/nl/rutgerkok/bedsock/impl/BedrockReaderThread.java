@@ -6,6 +6,8 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.jdt.annotation.Nullable;
+
 import nl.rutgerkok.bedsock.Logger;
 import nl.rutgerkok.bedsock.Logger.LogLevel;
 
@@ -20,7 +22,7 @@ final class BedrockReaderThread extends Thread {
 
     private final BufferedReader stream;
     private final Logger logger;
-    private volatile OutputFilter filter;
+    private @Nullable volatile OutputFilter filter;
 
     public BedrockReaderThread(BufferedReader stream, Logger logger) {
         this.stream = Objects.requireNonNull(stream);

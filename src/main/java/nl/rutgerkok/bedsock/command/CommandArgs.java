@@ -3,6 +3,8 @@ package nl.rutgerkok.bedsock.command;
 import java.util.Arrays;
 import java.util.Objects;
 
+import org.eclipse.jdt.annotation.Nullable;
+
 public class CommandArgs {
 
     private final String[] args;
@@ -21,7 +23,7 @@ public class CommandArgs {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         if (this == obj) {
             return true;
         }

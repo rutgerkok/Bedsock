@@ -1,5 +1,7 @@
 package nl.rutgerkok.bedsock.impl.event;
 
+import static nl.rutgerkok.bedsock.util.NullAnnotation.nullable;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -40,7 +42,7 @@ public class EventRegistryImpl implements EventRegistry {
     }
 
     private static class HandlerList {
-        private @Nullable Handler[] sorted;
+        private @Nullable List<Handler> sorted;
         private List<Handler> unsorted = new ArrayList<>();
 
         void add(Handler handler) {
@@ -51,7 +53,7 @@ public class EventRegistryImpl implements EventRegistry {
         }
 
         void run(Event event) {
-            Handler[] sorted = this.sorted;
+            List<Handler> sorted = this.sorted;
             if (sorted == null) {
                 // Need to sort
                 synchronized (this) {
@@ -59,8 +61,8 @@ public class EventRegistryImpl implements EventRegistry {
                     if (sorted == null) { // Check again after lock has been acquired
                         Handler[] handlers = unsorted.toArray(new Handler[0]);
                         Arrays.sort(handlers, Comparator.comparing(Handler::priority));
-                        sorted = handlers;
-                        this.sorted = handlers;
+                        sorted = Arrays.asList(handlers);
+                        this.sorted = sorted;
                     }
                 }
             }
@@ -103,7 +105,7 @@ public class EventRegistryImpl implements EventRegistry {
     @Override
     public void registerHandler(ActivePlugin plugin, Listener listener) {
         for (Method method : listener.getClass().getMethods()) {
-            EventHandler annotation = method.getAnnotation(EventHandler.class);
+            EventHandler annotation = nullable(method.getAnnotation(EventHandler.class));
             if (annotation == null) {
                 continue;
             }

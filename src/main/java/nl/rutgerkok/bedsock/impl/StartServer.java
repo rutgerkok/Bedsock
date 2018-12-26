@@ -7,6 +7,8 @@ import java.io.InputStreamReader;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.jdt.annotation.Nullable;
+
 import nl.rutgerkok.bedsock.Logger;
 import nl.rutgerkok.bedsock.command.CommandException;
 
@@ -16,21 +18,20 @@ import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
 @Command(description = "Starts the server wrapper", name = "start", mixinStandardHelpOptions = true, version = "0.0.1")
-public class StartServer implements Callable<Void> {
+public class StartServer implements Callable<@Nullable Void> {
 
     public static void main(String[] args) throws Exception {
         CommandLine.call(new StartServer(), args);
     }
 
-    @Parameters(index = "0", description = "The file to run.", defaultValue = "bedrock_server")
-    private File file;
+    @Parameters(index = "0", description = "The file to run.")
+    private File file = new File("bedrock_server");
 
-    @Option(names = {
-            "--plugin_folder" }, description = "The folder where all plugins are stored", defaultValue = "wrapper_plugins")
-    private File pluginFolder;
+    @Option(names = { "--plugin_folder" }, description = "The folder where all plugins are stored")
+    private File pluginFolder = new File("wrapper_plugins");
 
     @Override
-    public Void call() throws Exception {
+    public @Nullable Void call() throws Exception {
         InactiveServerImpl inactiveServer = new InactiveServerImpl();
         inactiveServer.getLogger().info("Starting server wrapper...");
         inactiveServer.pluginLoader.loadPlugins(inactiveServer, pluginFolder.toPath());
@@ -74,7 +75,7 @@ public class StartServer implements Callable<Void> {
         return null;
     }
 
-    private File getExecutableFile(Logger logger) {
+    private @Nullable File getExecutableFile(Logger logger) {
         File file = this.file.getAbsoluteFile();
 
         if (System.getProperty("os.name").contains("Windows") && !file.toString().endsWith(".exe")) {
