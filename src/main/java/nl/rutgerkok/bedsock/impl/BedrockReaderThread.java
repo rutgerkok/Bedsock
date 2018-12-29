@@ -64,7 +64,9 @@ final class BedrockReaderThread extends Thread {
         } catch (IOException e) {
             server.getLogger().error("Error reading server output", e);
         }
-        server.mainLoop.stopRequested = true;
+
+        // Stop the wrapper program now that the Bedrock server has stopped
+        server.getScheduler().requestStop();
     }
 
     void setFilter(OutputFilter filter) throws IllegalStateException {

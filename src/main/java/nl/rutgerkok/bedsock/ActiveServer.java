@@ -20,5 +20,10 @@ public interface ActiveServer extends Server {
      */
     CommandRunner getCommandRunner();
 
-
+    /**
+     * Gets the server scheduler.
+     *
+     * @return The scheduler.
+     */
+    Scheduler getScheduler();
 }

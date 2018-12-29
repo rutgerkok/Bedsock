@@ -71,7 +71,7 @@ public class StartServer implements Callable<@Nullable Void> {
         consoleReadThread.start();
         bedrockReadThread.start();
 
-        server.mainLoop.loop(server);
+        server.getScheduler().mainloop(server);
 
         return null;
     }

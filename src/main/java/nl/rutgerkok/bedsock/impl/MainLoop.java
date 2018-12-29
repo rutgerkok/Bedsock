@@ -37,8 +37,8 @@ final class MainLoop {
     void loop(ActiveServer server) {
         TickEvent tickEvent = new TickEvent(server);
         while (!stopRequested) {
-            server.getEventRegistry().callEvent(tickEvent);
             runTasks();
+            server.getEventRegistry().callEvent(tickEvent);
             nextTickTime += 1000L; // Run new tick in the next second
             sleepUntilNextTickTime();
         }

@@ -25,7 +25,8 @@ public interface Server {
     EventRegistry getEventRegistry();
 
     /**
-     * Gets the logger of the server.
+     * Gets the logger of the server. The methods in this class can be called from
+     * any thread.
      *
      * @return The logger.
      */
