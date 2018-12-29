@@ -7,6 +7,7 @@ import nl.rutgerkok.bedsock.InactiveServer;
 import nl.rutgerkok.bedsock.Logger;
 import nl.rutgerkok.bedsock.command.CommandRegistry;
 import nl.rutgerkok.bedsock.command.CommandRunner;
+import nl.rutgerkok.bedsock.event.EventRegistry;
 import nl.rutgerkok.bedsock.impl.command.BedrockCommandRunner;
 import nl.rutgerkok.bedsock.impl.command.MixedCommandRunner;
 
@@ -16,11 +17,13 @@ final class ActiveServerImpl implements ActiveServer {
     private final Logger logger;
     private final CommandRunner mixedCommandRunner;
     private final CommandRegistry commandRegistry;
+    private final EventRegistry eventRegistry;
 
     ActiveServerImpl(OutputStream serverStdIn, InactiveServer inactiveServer) {
         this.bedrockCommandRunner = new BedrockCommandRunner(serverStdIn);
         this.logger = inactiveServer.getLogger();
         this.commandRegistry = inactiveServer.getCommandRegistry();
+        this.eventRegistry = inactiveServer.getEventRegistry();
         this.mixedCommandRunner = new MixedCommandRunner(bedrockCommandRunner, commandRegistry);
     }
 
@@ -37,6 +40,11 @@ final class ActiveServerImpl implements ActiveServer {
     @Override
     public CommandRunner getCommandRunner() {
         return mixedCommandRunner;
+    }
+
+    @Override
+    public EventRegistry getEventRegistry() {
+        return eventRegistry;
     }
 
     @Override
