@@ -25,7 +25,7 @@ public class StartServer implements Callable<@Nullable Void> {
         CommandLine.call(new StartServer(), args);
     }
 
-    @Parameters(index = "0", description = "The file to run.")
+    @Parameters(index = "0", description = "The file to run.", defaultValue = "bedrock_server")
     private File file = new File("bedrock_server");
 
     @Option(names = { "--plugin_folder" }, description = "The folder where all plugins are stored")
@@ -35,8 +35,8 @@ public class StartServer implements Callable<@Nullable Void> {
     public @Nullable Void call() throws Exception {
         InactiveServerImpl inactiveServer = new InactiveServerImpl();
         inactiveServer.getServerLogger().info("Starting server wrapper...");
-        inactiveServer.pluginLoader.loadPlugins(inactiveServer, pluginFolder.toPath());
-        inactiveServer.pluginLoader.enablePlugins(inactiveServer);
+        inactiveServer.pluginRegistry.loadPlugins(inactiveServer, pluginFolder.toPath());
+        inactiveServer.pluginRegistry.enablePlugins(inactiveServer);
 
         File file = getExecutableFile(inactiveServer.getServerLogger());
         if (file == null) {

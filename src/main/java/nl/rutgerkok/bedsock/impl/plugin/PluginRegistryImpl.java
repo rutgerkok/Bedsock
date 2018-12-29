@@ -11,7 +11,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.jar.JarEntry;
@@ -23,8 +26,9 @@ import nl.rutgerkok.bedsock.json.JsonConfigs;
 import nl.rutgerkok.bedsock.plugin.Plugin;
 import nl.rutgerkok.bedsock.plugin.PluginDescription;
 import nl.rutgerkok.bedsock.plugin.PluginException;
+import nl.rutgerkok.bedsock.plugin.PluginRegistry;
 
-public final class PluginLoader {
+public final class PluginRegistryImpl implements PluginRegistry {
 
     private final Map<Plugin, ActivePluginImpl> plugins = new IdentityHashMap<>();
 
@@ -39,7 +43,7 @@ public final class PluginLoader {
     public void enablePlugins(InactiveServer server) throws PluginException {
         PluginException thrown = null;
         for (ActivePluginImpl activePlugin : this.plugins.values()) {
-            if (!activePlugin.enabled) {
+            if (!activePlugin.isEnabled()) {
                 try {
                     activePlugin.enable(server);
                 } catch (PluginException e) {
@@ -50,6 +54,18 @@ public final class PluginLoader {
         if (thrown != null) {
             throw thrown;
         }
+    }
+
+    @Override
+    public List<? extends PluginDescription> getActivePlugins() {
+        List<PluginDescription> list = new ArrayList<>();
+        for (ActivePluginImpl plugin : this.plugins.values()) {
+            if (!plugin.isEnabled()) {
+                continue;
+            }
+            list.add(plugin.getPluginDescription());
+        }
+        return Collections.unmodifiableList(list);
     }
 
     private void loadPlugin(InactiveServer server, Path jarFile) throws PluginException {
@@ -115,7 +131,14 @@ public final class PluginLoader {
         }
     }
 
-    void unloadAllPlugins() throws PluginException {
+    /**
+     * Unloads all plugins on the server. Doesn't reload any resource or behavior
+     * packs.
+     * 
+     * @throws PluginException
+     *             If a plugin throws in its onDisable method.
+     */
+    public void unloadAllPlugins() throws PluginException {
         Throwable last = null;
         PluginDescription offender = null;
 

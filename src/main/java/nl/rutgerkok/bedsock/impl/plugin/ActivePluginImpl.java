@@ -15,11 +15,11 @@ class ActivePluginImpl implements ActivePlugin, AutoCloseable {
     final PluginDescription description;
     final URLClassLoader classLoader;
     final Plugin plugin;
-    Logger logger;
-    boolean enabled = false;
+    final Logger logger;
+    private boolean enabled = false;
 
-    public ActivePluginImpl(PluginDescription description, URLClassLoader classLoader,
-            Plugin plugin, Logger serverLogger) {
+    public ActivePluginImpl(PluginDescription description, URLClassLoader classLoader, Plugin plugin,
+            Logger serverLogger) {
         this.description = Objects.requireNonNull(description, "description");
         this.classLoader = Objects.requireNonNull(classLoader, "classLoader");
         this.plugin = Objects.requireNonNull(plugin, "plugin");
@@ -31,9 +31,11 @@ class ActivePluginImpl implements ActivePlugin, AutoCloseable {
     public void close() throws PluginException {
         try {
             this.plugin.onDisable();
+            this.logger.info("Plugin is disabled");
         } catch (Throwable t) {
-            throw new PluginException(this.description, "Error disabling plugin", t);
+            throw new PluginException(this.description, "Error in plugin.onDisable", t);
         } finally {
+            enabled = false;
             try {
                 this.classLoader.close();
             } catch (IOException e) {
@@ -43,8 +45,18 @@ class ActivePluginImpl implements ActivePlugin, AutoCloseable {
     }
 
     public void enable(InactiveServer server) throws PluginException {
-        plugin.onEnable(server, this);
-        logger.info("Plugin is enabled");
+        try {
+            plugin.onEnable(server, this);
+            logger.info("Plugin is enabled");
+            enabled = true;
+        } catch (Throwable t) {
+            throw new PluginException(description, "Error on plugin.onEnable", t);
+        }
+    }
+
+    @Override
+    public Logger getLogger() {
+        return logger;
     }
 
     @Override
@@ -57,8 +69,7 @@ class ActivePluginImpl implements ActivePlugin, AutoCloseable {
         return description;
     }
 
-    @Override
-    public Logger getLogger() {
-        return logger;
+    boolean isEnabled() {
+        return enabled;
     }
 }

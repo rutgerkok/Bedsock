@@ -3,8 +3,8 @@ package nl.rutgerkok.bedsock.impl;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import nl.rutgerkok.bedsock.ActiveServer;
 import nl.rutgerkok.bedsock.event.wrapper.TickEvent;
+import nl.rutgerkok.bedsock.plugin.PluginException;
 
 final class MainLoop {
     private final ConcurrentLinkedQueue<Runnable> tasks = new ConcurrentLinkedQueue<>();
@@ -34,13 +34,18 @@ final class MainLoop {
         mainLoopThread.interrupt();
     }
 
-    void loop(ActiveServer server) {
+    void loop(ActiveServerImpl server) {
         TickEvent tickEvent = new TickEvent(server);
         while (!stopRequested) {
             runTasks();
             server.getEventRegistry().callEvent(tickEvent);
             nextTickTime += 1000L; // Run new tick in the next second
             sleepUntilNextTickTime();
+        }
+        try {
+            server.getPluginRegistry().unloadAllPlugins();
+        } catch (PluginException e) {
+            server.getServerLogger().error("Error disabling plugin", e);
         }
     }
 

@@ -1,6 +1,5 @@
 package nl.rutgerkok.bedsock.impl;
 
-import nl.rutgerkok.bedsock.ActiveServer;
 import nl.rutgerkok.bedsock.Scheduler;
 import nl.rutgerkok.bedsock.plugin.ActivePlugin;
 
@@ -35,7 +34,7 @@ final class SchedulerImpl implements Scheduler {
      * Starts the main server loop. This method won't return until the loop is stopped.
      * @param server The server.
      */
-    void mainloop(ActiveServer server) {
+    void mainloop(ActiveServerImpl server) {
         this.mainLoop.loop(server);
     }
 
