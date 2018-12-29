@@ -18,6 +18,7 @@ final class ActiveServerImpl implements ActiveServer {
     private final CommandRunner mixedCommandRunner;
     private final CommandRegistry commandRegistry;
     private final EventRegistry eventRegistry;
+    final MainLoop mainLoop;
 
     ActiveServerImpl(OutputStream serverStdIn, InactiveServer inactiveServer) {
         this.bedrockCommandRunner = new BedrockCommandRunner(serverStdIn);
@@ -25,6 +26,7 @@ final class ActiveServerImpl implements ActiveServer {
         this.commandRegistry = inactiveServer.getCommandRegistry();
         this.eventRegistry = inactiveServer.getEventRegistry();
         this.mixedCommandRunner = new MixedCommandRunner(bedrockCommandRunner, commandRegistry);
+        this.mainLoop = new MainLoop();
     }
 
     @Override

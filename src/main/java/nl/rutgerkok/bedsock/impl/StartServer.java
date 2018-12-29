@@ -11,7 +11,6 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import nl.rutgerkok.bedsock.Logger;
 import nl.rutgerkok.bedsock.command.CommandException;
-
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -67,10 +66,12 @@ public class StartServer implements Callable<@Nullable Void> {
         });
 
         ConsoleReadThread consoleReadThread = new ConsoleReadThread(System.in, server);
-        BedrockReaderThread bedrockReadThread = new BedrockReaderThread(outputOfProcess, server.getLogger());
+        BedrockReaderThread bedrockReadThread = new BedrockReaderThread(outputOfProcess, server);
         consoleReadThread.setDaemon(true);
         consoleReadThread.start();
         bedrockReadThread.start();
+
+        server.mainLoop.loop(server);
 
         return null;
     }

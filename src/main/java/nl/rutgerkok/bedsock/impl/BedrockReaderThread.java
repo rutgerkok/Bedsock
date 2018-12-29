@@ -8,7 +8,6 @@ import java.util.regex.Pattern;
 
 import org.eclipse.jdt.annotation.Nullable;
 
-import nl.rutgerkok.bedsock.Logger;
 import nl.rutgerkok.bedsock.Logger.LogLevel;
 
 /**
@@ -21,12 +20,12 @@ final class BedrockReaderThread extends Thread {
     private static final Pattern DATE_TIME_LEVEL = Pattern.compile("^\\[[\\d- :]+(?<level>[A-Z]+)\\] (?<message>.*)");
 
     private final BufferedReader stream;
-    private final Logger logger;
+    private final ActiveServerImpl server;
     private @Nullable volatile OutputFilter filter;
 
-    public BedrockReaderThread(BufferedReader stream, Logger logger) {
-        this.stream = Objects.requireNonNull(stream);
-        this.logger = Objects.requireNonNull(logger);
+    public BedrockReaderThread(BufferedReader stream, ActiveServerImpl server) {
+        this.stream = Objects.requireNonNull(stream, "stream");
+        this.server = Objects.requireNonNull(server, "server");
     }
 
     @Override
@@ -56,15 +55,16 @@ final class BedrockReaderThread extends Thread {
 
                 OutputFilter filter = this.filter;
                 if (filter == null) {
-                    logger.log(level, message);
+                    server.getLogger().log(level, message);
                 } else if (!filter.parse(message)) {
                     this.filter = null;
                 }
             }
             stream.close();
         } catch (IOException e) {
-            logger.error("Error reading server output", e);
+            server.getLogger().error("Error reading server output", e);
         }
+        server.mainLoop.stopRequested = true;
     }
 
     void setFilter(OutputFilter filter) throws IllegalStateException {
