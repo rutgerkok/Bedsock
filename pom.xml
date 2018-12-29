@@ -5,11 +5,11 @@
 
 	<groupId>nl.rutgerkok</groupId>
 	<artifactId>bedsock</artifactId>
-	<version>0.1</version>
+	<version>0.2-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>bedsock</name>
-	<url>http://maven.apache.org</url>
+	<name>Bedsock</name>
+	<url>https://github.com/rutgerkok/Bedsock</url>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
