@@ -90,8 +90,9 @@ public class StartServer implements Callable<@Nullable Void> {
     }
 
     private Process startServer(File file) throws IOException {
-        ProcessBuilder processBuilder = new ProcessBuilder(file.toString());
+        ProcessBuilder processBuilder = new ProcessBuilder("./" + file.getName());
         processBuilder.directory(file.getParentFile());
+        processBuilder.environment().put("LD_LIBRARY_PATH", ".");
         processBuilder.redirectErrorStream(true);
         Process process = processBuilder.start();
         return process;
