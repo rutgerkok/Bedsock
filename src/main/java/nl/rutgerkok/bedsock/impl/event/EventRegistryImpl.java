@@ -94,7 +94,7 @@ public class EventRegistryImpl implements EventRegistry {
                 try {
                     handler.accept((E) event);
                 } catch (Throwable t) {
-                    this.plugin.getPluginLogger().error("Error in event " + event.getClass().getSimpleName(), t);
+                    this.plugin.getLogger().error("Error in event " + event.getClass().getSimpleName(), t);
                 }
             }
         };
@@ -138,7 +138,7 @@ public class EventRegistryImpl implements EventRegistry {
                         // Private methods should already be filtered out during registration
                         throw new RuntimeException(e);
                     } catch (InvocationTargetException e) {
-                        plugin.getPluginLogger().error("Error in event " + event.getClass().getSimpleName(),
+                        plugin.getLogger().error("Error in event " + event.getClass().getSimpleName(),
                                 e.getCause());
                     }
                 }

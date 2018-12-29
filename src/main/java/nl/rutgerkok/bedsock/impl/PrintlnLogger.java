@@ -3,7 +3,7 @@ package nl.rutgerkok.bedsock.impl;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import nl.rutgerkok.bedsock.Logger;
+import nl.rutgerkok.bedsock.logger.Logger;
 
 /**
  * Ultra-simple logger.

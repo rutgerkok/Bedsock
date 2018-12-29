@@ -32,7 +32,7 @@ public class ConsoleReadThread extends Thread {
                     runCommand(command);
                 }
             } catch (IOException e) {
-                server.getLogger().error("Error reading command", e);
+                server.getServerLogger().error("Error reading command", e);
             }
         }
     }
@@ -42,7 +42,7 @@ public class ConsoleReadThread extends Thread {
             try {
                 server.getCommandRunner().runCommand(command);
             } catch (CommandException e) {
-                server.getLogger().error(e.getMessage());
+                server.getServerLogger().error(e.getMessage());
             }
         });
     }

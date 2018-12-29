@@ -5,7 +5,7 @@ import java.net.URLClassLoader;
 import java.util.Objects;
 
 import nl.rutgerkok.bedsock.InactiveServer;
-import nl.rutgerkok.bedsock.Logger;
+import nl.rutgerkok.bedsock.logger.Logger;
 import nl.rutgerkok.bedsock.plugin.ActivePlugin;
 import nl.rutgerkok.bedsock.plugin.Plugin;
 import nl.rutgerkok.bedsock.plugin.PluginDescription;
@@ -58,7 +58,7 @@ class ActivePluginImpl implements ActivePlugin, AutoCloseable {
     }
 
     @Override
-    public Logger getPluginLogger() {
+    public Logger getLogger() {
         return logger;
     }
 }

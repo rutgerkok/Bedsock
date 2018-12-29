@@ -9,8 +9,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jdt.annotation.Nullable;
 
-import nl.rutgerkok.bedsock.Logger;
 import nl.rutgerkok.bedsock.command.CommandException;
+import nl.rutgerkok.bedsock.logger.Logger;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -32,16 +32,16 @@ public class StartServer implements Callable<@Nullable Void> {
     @Override
     public @Nullable Void call() throws Exception {
         InactiveServerImpl inactiveServer = new InactiveServerImpl();
-        inactiveServer.getLogger().info("Starting server wrapper...");
+        inactiveServer.getServerLogger().info("Starting server wrapper...");
         inactiveServer.pluginLoader.loadPlugins(inactiveServer, pluginFolder.toPath());
         inactiveServer.pluginLoader.enablePlugins(inactiveServer);
 
-        File file = getExecutableFile(inactiveServer.getLogger());
+        File file = getExecutableFile(inactiveServer.getServerLogger());
         if (file == null) {
             return null;
         }
 
-        inactiveServer.getLogger().info("Starting Bedrock server...");
+        inactiveServer.getServerLogger().info("Starting Bedrock server...");
         Process process = startServer(file);
 
         BufferedReader outputOfProcess = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -51,7 +51,7 @@ public class StartServer implements Callable<@Nullable Void> {
             @Override
             public void run() {
                 if (process.isAlive()) {
-                    server.getLogger().warning(
+                    server.getServerLogger().warning(
                             "Wrapper was forcibly closed, but Bedrock server was still active. Closing it now...");
                     try {
                         server.getBedrockCommandRunner().runCommand("stop");

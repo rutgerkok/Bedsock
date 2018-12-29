@@ -1,12 +1,35 @@
-package nl.rutgerkok.bedsock;
+package nl.rutgerkok.bedsock.logger;
 
+/**
+ * A logger. A logger records server output and can help in debugging. Loggers
+ * must be thread-safe.
+ *
+ * @see ConsoleLogger
+ * @see PersistentLogger
+ */
 public interface Logger {
 
     /**
      * The level at which a message is logged.
      */
     enum LogLevel {
-        INFO, DEBUG, ERROR, WARNING
+        /**
+         * General server messages.
+         */
+        INFO,
+        /**
+         * Messages that should be hidden unless debug mode is enabled.
+         */
+        DEBUG,
+        /**
+         * Errors that prevent normal functioning of the server.
+         */
+        ERROR,
+        /**
+         * Warnings that indicate that something unexpected happened, but that the
+         * server can still function normally.
+         */
+        WARNING
     }
 
     /**

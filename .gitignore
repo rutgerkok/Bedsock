@@ -9,3 +9,4 @@ dependency-reduced-pom.xml
 
 # Project
 wrapper_plugins/
+server.log

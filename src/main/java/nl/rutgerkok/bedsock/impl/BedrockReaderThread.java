@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.jdt.annotation.Nullable;
 
-import nl.rutgerkok.bedsock.Logger.LogLevel;
+import nl.rutgerkok.bedsock.logger.Logger.LogLevel;
 
 /**
  * This reads output from Minecraft.
@@ -55,14 +55,14 @@ final class BedrockReaderThread extends Thread {
 
                 OutputFilter filter = this.filter;
                 if (filter == null) {
-                    server.getLogger().log(level, message);
+                    server.getServerLogger().log(level, message);
                 } else if (!filter.parse(message)) {
                     this.filter = null;
                 }
             }
             stream.close();
         } catch (IOException e) {
-            server.getLogger().error("Error reading server output", e);
+            server.getServerLogger().error("Error reading server output", e);
         }
 
         // Stop the wrapper program now that the Bedrock server has stopped

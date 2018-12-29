@@ -2,7 +2,7 @@ package nl.rutgerkok.bedsock.impl.plugin;
 
 import java.util.Objects;
 
-import nl.rutgerkok.bedsock.Logger;
+import nl.rutgerkok.bedsock.logger.Logger;
 
 /**
  * Logger that prefixes all messages with the name of the plugin.

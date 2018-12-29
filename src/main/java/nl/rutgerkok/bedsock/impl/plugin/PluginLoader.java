@@ -58,6 +58,9 @@ public final class PluginLoader {
 
         try (JarFile jar = new JarFile(jarFile.toFile())) {
             JarEntry entry = jar.getJarEntry("plugin.json");
+            if (entry == null) {
+                throw new PluginException(description, "No plugin.json found", new NullPointerException());
+            }
             try (BufferedReader reader = new BufferedReader(
                     new InputStreamReader(jar.getInputStream(entry), StandardCharsets.UTF_8))) {
                 description = new PluginDescriptionImpl(JsonConfigs.loadFromReader(reader));
@@ -65,7 +68,7 @@ public final class PluginLoader {
                         ClassLoader.getSystemClassLoader());
                 Plugin plugin = nonNull((Plugin) classLoader.loadClass(description.getMainClass()).newInstance());
                 ActivePluginImpl activePlugin = new ActivePluginImpl(description, classLoader, plugin,
-                        server.getLogger());
+                        server.getServerLogger());
                 this.plugins.put(plugin, activePlugin);
             } catch (InvalidConfigException e) {
                 throw new PluginException(description, "Invalid plugin description file in " + jarFile.getFileName(),

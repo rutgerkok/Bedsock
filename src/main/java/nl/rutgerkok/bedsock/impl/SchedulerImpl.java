@@ -24,7 +24,7 @@ final class SchedulerImpl implements Scheduler {
                 try {
                     runnable.run();
                 } catch (Throwable t) {
-                    plugin.getPluginLogger().error("Error in scheduled code", t);
+                    plugin.getLogger().error("Error in scheduled code", t);
                 }
             }
         };

@@ -2,6 +2,7 @@ package nl.rutgerkok.bedsock;
 
 import nl.rutgerkok.bedsock.command.CommandRegistry;
 import nl.rutgerkok.bedsock.event.EventRegistry;
+import nl.rutgerkok.bedsock.logger.ForwardingLogger;
 
 /**
  * Represents a Bedrock server. It is unspecified whether the server is already
@@ -30,5 +31,5 @@ public interface Server {
      *
      * @return The logger.
      */
-    Logger getLogger();
+    ForwardingLogger getServerLogger();
 }

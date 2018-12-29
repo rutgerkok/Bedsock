@@ -11,6 +11,7 @@ import nl.rutgerkok.bedsock.event.EventRegistry;
 import nl.rutgerkok.bedsock.event.Listener;
 import nl.rutgerkok.bedsock.impl.PrintlnLogger;
 import nl.rutgerkok.bedsock.impl.event.EventRegistryImpl;
+import nl.rutgerkok.bedsock.logger.Logger;
 import nl.rutgerkok.bedsock.plugin.ActivePlugin;
 import nl.rutgerkok.bedsock.plugin.Plugin;
 import nl.rutgerkok.bedsock.plugin.PluginDescription;
@@ -44,7 +45,7 @@ class EventTest {
         }
 
         @Override
-        public Logger getPluginLogger() {
+        public Logger getLogger() {
             return new PrintlnLogger();
         }
 

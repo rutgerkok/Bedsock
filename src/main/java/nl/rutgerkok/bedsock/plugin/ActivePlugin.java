@@ -1,6 +1,6 @@
 package nl.rutgerkok.bedsock.plugin;
 
-import nl.rutgerkok.bedsock.Logger;
+import nl.rutgerkok.bedsock.logger.Logger;
 
 public interface ActivePlugin {
 
@@ -8,6 +8,6 @@ public interface ActivePlugin {
 
     PluginDescription getPluginDescription();
 
-    Logger getPluginLogger();
+    Logger getLogger();
 
 }

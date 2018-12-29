@@ -53,7 +53,7 @@ public final class MixedCommandRunner implements CommandRunner {
         Optional<WrapperCommand> oCommand = registry.getConsoleCommand(args.getString(0));
         if (oCommand.isPresent()) {
             WrapperCommand command = oCommand.get();
-            command.run(command.getPlugin().getPluginLogger()::info, args.shift());
+            command.run(command.getPlugin().getLogger()::info, args.shift());
             return;
         }
 
