@@ -19,6 +19,8 @@ import picocli.CommandLine.Parameters;
 @Command(description = "Starts the server wrapper", name = "start", mixinStandardHelpOptions = true, version = "0.0.1")
 public class StartServer implements Callable<@Nullable Void> {
 
+    private static final boolean ON_MS_WINDOWS = System.getProperty("os.name").contains("Windows");
+
     public static void main(String[] args) throws Exception {
         CommandLine.call(new StartServer(), args);
     }
@@ -79,7 +81,7 @@ public class StartServer implements Callable<@Nullable Void> {
     private @Nullable File getExecutableFile(Logger logger) {
         File file = this.file.getAbsoluteFile();
 
-        if (System.getProperty("os.name").contains("Windows") && !file.toString().endsWith(".exe")) {
+        if (ON_MS_WINDOWS && !file.toString().endsWith(".exe")) {
             file = new File(file + ".exe");
         }
         if (!file.exists()) {
@@ -90,7 +92,8 @@ public class StartServer implements Callable<@Nullable Void> {
     }
 
     private Process startServer(File file) throws IOException {
-        ProcessBuilder processBuilder = new ProcessBuilder("./" + file.getName());
+        String fileName = ON_MS_WINDOWS ? file.toString() : "./" + file.getName();
+        ProcessBuilder processBuilder = new ProcessBuilder(fileName);
         processBuilder.directory(file.getParentFile());
         processBuilder.environment().put("LD_LIBRARY_PATH", ".");
         processBuilder.redirectErrorStream(true);
