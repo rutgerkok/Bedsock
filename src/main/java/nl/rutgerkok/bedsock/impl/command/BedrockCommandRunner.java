@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 
 import org.eclipse.jdt.annotation.Nullable;
 
+import nl.rutgerkok.bedsock.command.CommandArgs;
 import nl.rutgerkok.bedsock.command.CommandException;
 import nl.rutgerkok.bedsock.command.CommandRunner;
 import nl.rutgerkok.bedsock.impl.OutputFilter;
@@ -57,7 +58,7 @@ public final class BedrockCommandRunner implements CommandRunner {
     }
 
     @Override
-    public String runAndRecordCommand(String command) throws CommandException {
+    public String runAndRecordCommand(CommandArgs command) throws CommandException {
         // Run a two commands - the requested command, an a non-existing command.
         // When we detect that the non-existing command is running, we know that the
         // output of the first command has ended
@@ -90,10 +91,7 @@ public final class BedrockCommandRunner implements CommandRunner {
     }
 
     @Override
-    public void runCommand(String command) throws CommandException {
-        if (command.startsWith("/")) {
-            command = command.substring(1); // Strip the initial slash, console does not accept it
-        }
+    public void runCommand(CommandArgs command) throws CommandException {
         synchronized (lock) {
             try {
                 serverStdIn.write(command + System.lineSeparator());
@@ -111,7 +109,7 @@ public final class BedrockCommandRunner implements CommandRunner {
      * @param consumer
      *            Connection to the Bedrock server output.
      */
-    void setOutputFilterSeter(Consumer<OutputFilter> consumer) {
+    public void setOutputFilterSeter(Consumer<OutputFilter> consumer) {
         this.outputFilterSetter = Objects.requireNonNull(consumer);
     }
 

@@ -9,6 +9,6 @@ public final class PluginException extends Exception {
     private static final long serialVersionUID = 127479553863082835L;
 
     public PluginException(PluginDescription plugin, String reason, Throwable e) {
-
+        super("Error in plugin " + plugin.getName() + ": " + reason, e);
     }
 }

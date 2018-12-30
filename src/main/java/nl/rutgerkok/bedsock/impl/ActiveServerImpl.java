@@ -3,10 +3,12 @@ package nl.rutgerkok.bedsock.impl;
 import java.io.OutputStream;
 
 import nl.rutgerkok.bedsock.ActiveServer;
+import nl.rutgerkok.bedsock.command.CommandArgs;
 import nl.rutgerkok.bedsock.command.CommandRegistry;
 import nl.rutgerkok.bedsock.command.CommandRunner;
 import nl.rutgerkok.bedsock.event.EventRegistry;
 import nl.rutgerkok.bedsock.impl.command.BedrockCommandRunner;
+import nl.rutgerkok.bedsock.impl.command.CommandArgsImpl;
 import nl.rutgerkok.bedsock.impl.command.MixedCommandRunner;
 import nl.rutgerkok.bedsock.impl.plugin.PluginRegistryImpl;
 import nl.rutgerkok.bedsock.logger.ForwardingLogger;
@@ -32,7 +34,7 @@ final class ActiveServerImpl implements ActiveServer {
     }
 
     @Override
-    public CommandRunner getBedrockCommandRunner() {
+    public BedrockCommandRunner getBedrockCommandRunner() {
         return bedrockCommandRunner;
     }
 
@@ -64,5 +66,10 @@ final class ActiveServerImpl implements ActiveServer {
     @Override
     public ForwardingLogger getServerLogger() {
         return logger;
+    }
+
+    @Override
+    public CommandArgs parseCommand(String string) {
+        return CommandArgsImpl.parse(this, string);
     }
 }

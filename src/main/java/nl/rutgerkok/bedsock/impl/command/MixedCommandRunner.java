@@ -25,8 +25,7 @@ public final class MixedCommandRunner implements CommandRunner {
     }
 
     @Override
-    public String runAndRecordCommand(String commandString) throws CommandException {
-        CommandArgs args = new CommandArgs(commandString);
+    public String runAndRecordCommand(CommandArgs args) throws CommandException {
         args.expectMinSize(1);
         Optional<WrapperCommand> oCommand = registry.getConsoleCommand(args.getString(0));
         if (oCommand.isPresent()) {
@@ -43,12 +42,11 @@ public final class MixedCommandRunner implements CommandRunner {
         }
 
         // Fall back to Bedrock
-        return bedrockCommandRunner.runAndRecordCommand(commandString);
+        return bedrockCommandRunner.runAndRecordCommand(args);
     }
 
     @Override
-    public void runCommand(String commandString) throws CommandException {
-        CommandArgs args = new CommandArgs(commandString);
+    public void runCommand(CommandArgs args) throws CommandException {
         args.expectMinSize(1);
         Optional<WrapperCommand> oCommand = registry.getConsoleCommand(args.getString(0));
         if (oCommand.isPresent()) {
@@ -58,7 +56,7 @@ public final class MixedCommandRunner implements CommandRunner {
         }
 
         // Fall back to Bedrock
-        bedrockCommandRunner.runCommand(commandString);
+        bedrockCommandRunner.runCommand(args);
     }
 
 }

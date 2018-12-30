@@ -11,6 +11,7 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import nl.rutgerkok.bedsock.command.CommandException;
 import nl.rutgerkok.bedsock.logger.Logger;
+
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -56,7 +57,7 @@ public class StartServer implements Callable<@Nullable Void> {
                     server.getServerLogger().warning(
                             "Wrapper was forcibly closed, but Bedrock server was still active. Closing it now...");
                     try {
-                        server.getBedrockCommandRunner().runCommand("stop");
+                        server.getBedrockCommandRunner().runCommand(server.parseCommand("stop"));
                         if (!process.waitFor(5, TimeUnit.SECONDS)) {
                             process.destroyForcibly(); // Ok, failed
                         }
@@ -73,6 +74,7 @@ public class StartServer implements Callable<@Nullable Void> {
         consoleReadThread.start();
         bedrockReadThread.start();
 
+        server.getBedrockCommandRunner().setOutputFilterSeter(bedrockReadThread::setFilter);
         server.getScheduler().mainloop(server);
 
         return null;

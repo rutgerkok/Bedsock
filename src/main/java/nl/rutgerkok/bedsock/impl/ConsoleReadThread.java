@@ -40,7 +40,7 @@ public class ConsoleReadThread extends Thread {
     private void runCommand(String command) {
         server.getScheduler().runOnMainThread0(() -> {
             try {
-                server.getCommandRunner().runCommand(command);
+                server.getCommandRunner().runCommand(server.parseCommand(command));
             } catch (CommandException e) {
                 server.getServerLogger().error(e.getMessage());
             }

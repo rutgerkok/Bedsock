@@ -13,7 +13,7 @@ public interface CommandRunner {
      * <p>
      * Note: this method cannot be called from the thread that reads the console, as
      * that would lead to a deadlock.
-     * 
+     *
      * @param command
      *            The command.
      * @return The output of the command.
@@ -21,7 +21,7 @@ public interface CommandRunner {
      *             If the command cannot be passed to the bedrock server, for
      *             example because it is empty.
      */
-    String runAndRecordCommand(String command) throws CommandException;
+    String runAndRecordCommand(CommandArgs command) throws CommandException;
 
     /**
      * Runs a command on the Bedrock server. If the command starts with a slash,
@@ -33,5 +33,5 @@ public interface CommandRunner {
      *             If the command cannot be passed to the bedrock server, for
      *             example because it is empty.
      */
-    void runCommand(String command) throws CommandException;
+    void runCommand(CommandArgs command) throws CommandException;
 }

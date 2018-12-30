@@ -2,6 +2,7 @@ package nl.rutgerkok.bedsock.command;
 
 import java.util.Objects;
 
+import nl.rutgerkok.bedsock.logger.Logger;
 import nl.rutgerkok.bedsock.plugin.ActivePlugin;
 
 /**
@@ -22,6 +23,14 @@ public abstract class WrapperCommand {
      * @return A description.
      */
     public abstract String getDescription();
+
+    /**
+     * Gets access to the plugin logger.
+     * @return The logger.
+     */
+    public final Logger getLogger() {
+        return plugin.getLogger();
+    }
 
     /**
      * Gets the plugin that provided this command.
