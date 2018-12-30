@@ -1,4 +1,4 @@
-package nl.rutgerkok.bedsock.json;
+package nl.rutgerkok.bedsock.config;
 
 import java.util.HashMap;
 import java.util.List;

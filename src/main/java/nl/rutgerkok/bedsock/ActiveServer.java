@@ -38,4 +38,5 @@ public interface ActiveServer extends Server {
      * @return The parsed command string.
      */
     CommandArgs parseCommand(String string);
+
 }

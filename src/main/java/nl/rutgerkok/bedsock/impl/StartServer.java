@@ -34,7 +34,7 @@ public class StartServer implements Callable<@Nullable Void> {
 
     @Override
     public @Nullable Void call() throws Exception {
-        InactiveServerImpl inactiveServer = new InactiveServerImpl();
+        InactiveServerImpl inactiveServer = new InactiveServerImpl(this.file.toPath().toAbsolutePath().getParent());
         inactiveServer.getServerLogger().info("Starting server wrapper...");
         inactiveServer.pluginRegistry.loadPlugins(inactiveServer, pluginFolder.toPath());
         inactiveServer.pluginRegistry.enablePlugins(inactiveServer);

@@ -1,4 +1,4 @@
-package nl.rutgerkok.bedsock.json;
+package nl.rutgerkok.bedsock.config;
 
 /**
  * Thrown when an invalid configuration file is found.

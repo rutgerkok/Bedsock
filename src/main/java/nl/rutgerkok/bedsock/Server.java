@@ -27,8 +27,15 @@ public interface Server {
     EventRegistry getEventRegistry();
 
     /**
+     * Gets the folder structure of the server.
+     *
+     * @return The server folder structure.
+     */
+    ServerFolders getFolders();
+
+    /**
      * Gets the plugin registry, which holds all loaded plugins.
-     * 
+     *
      * @return The plugin registry.
      */
     PluginRegistry getPluginRegistry();

@@ -3,6 +3,7 @@ package nl.rutgerkok.bedsock.impl;
 import java.io.OutputStream;
 
 import nl.rutgerkok.bedsock.ActiveServer;
+import nl.rutgerkok.bedsock.ServerFolders;
 import nl.rutgerkok.bedsock.command.CommandArgs;
 import nl.rutgerkok.bedsock.command.CommandRegistry;
 import nl.rutgerkok.bedsock.command.CommandRunner;
@@ -22,6 +23,7 @@ final class ActiveServerImpl implements ActiveServer {
     private final EventRegistry eventRegistry;
     private final SchedulerImpl scheduler;
     private final PluginRegistryImpl pluginRegistry;
+    private final ServerFolders folders;
 
     ActiveServerImpl(OutputStream serverStdIn, InactiveServerImpl inactiveServer) {
         this.bedrockCommandRunner = new BedrockCommandRunner(serverStdIn);
@@ -31,6 +33,7 @@ final class ActiveServerImpl implements ActiveServer {
         this.mixedCommandRunner = new MixedCommandRunner(bedrockCommandRunner, commandRegistry);
         this.scheduler = new SchedulerImpl();
         this.pluginRegistry = inactiveServer.getPluginRegistry();
+        this.folders = inactiveServer.getFolders();
     }
 
     @Override
@@ -51,6 +54,11 @@ final class ActiveServerImpl implements ActiveServer {
     @Override
     public EventRegistry getEventRegistry() {
         return eventRegistry;
+    }
+
+    @Override
+    public ServerFolders getFolders() {
+        return folders;
     }
 
     @Override

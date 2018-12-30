@@ -1,7 +1,7 @@
 package nl.rutgerkok.bedsock.impl.plugin;
 
-import nl.rutgerkok.bedsock.json.ConfigObject;
-import nl.rutgerkok.bedsock.json.InvalidConfigException;
+import nl.rutgerkok.bedsock.config.ConfigObject;
+import nl.rutgerkok.bedsock.config.InvalidConfigException;
 import nl.rutgerkok.bedsock.plugin.PluginDescription;
 
 final class PluginDescriptionImpl implements PluginDescription {

@@ -2,6 +2,6 @@
  * Classes for (JSON) configuration.
  */
 @NonNullByDefault
-package nl.rutgerkok.bedsock.json;
+package nl.rutgerkok.bedsock.config;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;

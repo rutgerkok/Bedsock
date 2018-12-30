@@ -21,8 +21,8 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import nl.rutgerkok.bedsock.InactiveServer;
-import nl.rutgerkok.bedsock.json.InvalidConfigException;
-import nl.rutgerkok.bedsock.json.JsonConfigs;
+import nl.rutgerkok.bedsock.config.InvalidConfigException;
+import nl.rutgerkok.bedsock.config.JsonConfigs;
 import nl.rutgerkok.bedsock.plugin.Plugin;
 import nl.rutgerkok.bedsock.plugin.PluginDescription;
 import nl.rutgerkok.bedsock.plugin.PluginException;
@@ -97,6 +97,8 @@ public final class PluginRegistryImpl implements PluginRegistry {
                 throw new PluginException(description, "Error instantiating plugin", e.getCause());
             } catch (IllegalAccessException e) {
                 throw new PluginException(description, "Main class has no public no-args constructor.", e);
+            } catch (NoClassDefFoundError e) {
+                throw new PluginException(description, "Main class of plugin cannot access another class", e);
             }
         } catch (IOException e) {
             throw new PluginException(description,
@@ -134,7 +136,7 @@ public final class PluginRegistryImpl implements PluginRegistry {
     /**
      * Unloads all plugins on the server. Doesn't reload any resource or behavior
      * packs.
-     * 
+     *
      * @throws PluginException
      *             If a plugin throws in its onDisable method.
      */
