@@ -19,4 +19,13 @@ public interface ServerFolders {
      * @return The root folder.
      */
     Path getRootFolder();
+
+    /**
+     * Gets the worlds folder.
+     * 
+     * @return The folder containing all the worlds.
+     */
+    default Path getWorldsFolder() {
+        return getRootFolder().resolve("worlds");
+    }
 }
