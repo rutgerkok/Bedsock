@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -43,8 +44,13 @@ public final class ConfigObject {
         this.internal = internal;
     }
 
+    Map<String, Object> accessMap() {
+        return internal;
+    }
+
     /**
-     * Gets an integer.
+     * Gets an integer. If a float is stored at the given location, it is
+     * automatically cast to an integer.
      *
      * @param key
      *            Storage location.
@@ -53,6 +59,7 @@ public final class ConfigObject {
      *             If no integer (or float) is stored at that location.
      */
     public int getInt(String key) throws InvalidConfigException {
+        Objects.requireNonNull(key, "key");
         Object value = internal.get(key);
         if (value == null || !(value instanceof Number)) {
             throw new InvalidConfigException("Expected number at " + key + ", found " + getTypeOf(value));
@@ -79,6 +86,45 @@ public final class ConfigObject {
     }
 
     /**
+     * Gets the given int. If no int is stored at the given location, the given
+     * default value is stored at that location.
+     * 
+     * @param key
+     *            The storage location.
+     * @param defaultValue
+     *            Value used if no integer is stored at the given location.
+     * @return The int stored at the given location, or the default value.
+     */
+    public int getOrPlaceInt(String key, int defaultValue) {
+        try {
+            return getInt(key);
+        } catch (InvalidConfigException e) {
+            internal.put(key, defaultValue);
+            return defaultValue;
+        }
+    }
+
+    /**
+     * Gets the given string. If no string is stored at the given location, the
+     * default value is stored at that location.
+     * 
+     * @param key
+     *            The storage location.
+     * @param defaultValue
+     *            Default value, used if there is no string stored.
+     * @return The string at the given location, or the default value.
+     */
+    public String getOrPlaceString(String key, String defaultValue) {
+        Objects.requireNonNull(defaultValue, "defaultValue");
+        try {
+            return getString(key);
+        } catch (InvalidConfigException e) {
+            internal.put(key, defaultValue);
+            return defaultValue;
+        }
+    }
+
+    /**
      * Gets a string stored at the given location.
      *
      * @param key
@@ -88,6 +134,7 @@ public final class ConfigObject {
      *             If no string is stored at that location.
      */
     public String getString(String key) throws InvalidConfigException {
+        Objects.requireNonNull(key, "key");
         Object value = internal.get(key);
         if (value == null || !(value instanceof String)) {
             throw new InvalidConfigException("Expected string at " + key + ", found " + getTypeOf(value));

@@ -1,8 +1,10 @@
 package nl.rutgerkok.bedsock.config;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -32,15 +34,13 @@ public final class JsonConfigs {
      *            The plugin to load the configuration file for.
      * @return The configuration object, or an empty object if that file doesn't
      *         exist yet.
-     * @throws InvalidConfigException
-     *             If a configuration file exists, but it is not valid JSON.
      */
-    public static ConfigObject loadForPlugin(ServerFolders folders, ActivePlugin plugin) throws InvalidConfigException {
+    public static ConfigObject loadForPlugin(ServerFolders folders, ActivePlugin plugin) {
         Path file = plugin.getConfigFolder(folders).resolve(JSON_CONFIG_FILE);
         if (Files.exists(file)) {
             try (BufferedReader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
                 return loadFromReader(reader);
-            } catch (IOException e) {
+            } catch (IOException | InvalidConfigException e) {
                 plugin.getLogger().error("Could not read configuration file", e);
             }
         }
@@ -63,6 +63,33 @@ public final class JsonConfigs {
             return new ConfigObject((Map<String, Object>) value);
         }
         throw new InvalidConfigException("Expected object in config file, found " + ConfigObject.getTypeOf(value));
+    }
+
+    public static void saveForPlugin(ServerFolders folders, ActivePlugin plugin, ConfigObject config) {
+        Path file = plugin.getConfigFolder(folders).resolve(JSON_CONFIG_FILE);
+        try {
+            Files.createDirectories(file.getParent());
+            try (BufferedWriter writer = Files.newBufferedWriter(file, StandardCharsets.UTF_8)) {
+                saveToWriter(writer, config);
+            }
+        } catch (IOException e) {
+            plugin.getLogger().error("Failed to save configuration file", e);
+        }
+    }
+
+    /**
+     * Writes the given configuration object to a writer.
+     * 
+     * @param writer
+     *            The writer, see for example
+     *            {@link Files#newBufferedWriter(Path, java.nio.charset.Charset, java.nio.file.OpenOption...)}.
+     * @param config
+     *            The configuration object.
+     * @throws IOException
+     *             If writing fails.
+     */
+    public static void saveToWriter(Writer writer, ConfigObject config) throws IOException {
+        JSONObject.writeJSONString(config.accessMap(), writer);
     }
 
 }
