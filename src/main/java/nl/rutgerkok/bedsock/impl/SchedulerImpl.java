@@ -1,12 +1,15 @@
 package nl.rutgerkok.bedsock.impl;
 
+import java.util.Objects;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import org.eclipse.jdt.annotation.Nullable;
 
 import nl.rutgerkok.bedsock.Scheduler;
 import nl.rutgerkok.bedsock.plugin.ActivePlugin;
+import nl.rutgerkok.bedsock.util.TimeSpan;
 
 /**
  * Hosts the main loop and the worked threads.
@@ -15,9 +18,14 @@ import nl.rutgerkok.bedsock.plugin.ActivePlugin;
 final class SchedulerImpl implements Scheduler {
 
     private final MainLoop mainLoop;
+    private final ScheduledThreadPoolExecutor worker;
 
     SchedulerImpl() {
-        this.mainLoop = new MainLoop();
+        mainLoop = new MainLoop();
+        worker = new ScheduledThreadPoolExecutor(0);
+        worker.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
+        worker.setContinueExistingPeriodicTasksAfterShutdownPolicy(false);
+        worker.setRemoveOnCancelPolicy(true);
     }
 
     private Runnable catchingErrors(ActivePlugin plugin, @Nullable Runnable runnable) {
@@ -50,12 +58,12 @@ final class SchedulerImpl implements Scheduler {
     }
 
     @Override
-    public Executor mainThreadExecutor(ActivePlugin plugin) {
+    public Executor mainThreadExecutor() {
         return new Executor() {
 
             @Override
             public void execute(@Nullable Runnable runnable) {
-                runOnMainThread(plugin, runnable);
+                runOnMainThread0(Objects.requireNonNull(runnable, "runnable"));
             }
 
         };
@@ -63,6 +71,7 @@ final class SchedulerImpl implements Scheduler {
 
     void requestStop() {
         this.mainLoop.stopRequested = true;
+        this.worker.shutdown();
     }
 
     @Override
@@ -82,12 +91,26 @@ final class SchedulerImpl implements Scheduler {
     }
 
     @Override
-    public Executor workerThreadExecutor(ActivePlugin plugin) {
+    public Ticket runOnWorkerThreadDelayed(ActivePlugin plugin, Runnable runnable, TimeSpan delay) {
+        ScheduledFuture<?> future = worker.schedule(catchingErrors(plugin, runnable), delay.getValue(),
+                delay.getUnit());
+        return () -> future.cancel(false);
+    }
+
+    @Override
+    public Ticket runOnWorkerThreadRepeating(ActivePlugin plugin, Runnable runnable, TimeSpan time) {
+        ScheduledFuture<?> future = worker.scheduleAtFixedRate(catchingErrors(plugin, runnable), time.getValue(),
+                time.getValue(), time.getUnit());
+        return () -> future.cancel(false);
+    }
+
+    @Override
+    public Executor workerThreadExecutor() {
         return new Executor() {
 
             @Override
             public void execute(@Nullable Runnable command) {
-                ForkJoinPool.commonPool().execute(catchingErrors(plugin, command));
+                worker.execute(command);
             }
 
         };
