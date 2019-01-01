@@ -24,7 +24,11 @@ class EventTest {
 
     }
 
-    public static class MyListener implements Listener {
+    public static class MyListener extends Listener {
+
+        protected MyListener(ActivePlugin plugin) {
+            super(plugin);
+        }
 
         @EventHandler
         public void onTest(MyEvent event) {
@@ -33,6 +37,11 @@ class EventTest {
     }
 
     private static class MyPlugin implements ActivePlugin {
+
+        @Override
+        public Logger getLogger() {
+            return new PrintlnLogger();
+        }
 
         @Override
         public Plugin getPlugin() {
@@ -44,18 +53,13 @@ class EventTest {
             return () -> "MyPlugin";
         }
 
-        @Override
-        public Logger getLogger() {
-            return new PrintlnLogger();
-        }
-
     }
 
     @Test
     public void firing() {
         EventRegistry registry = new EventRegistryImpl();
 
-        registry.registerHandler(new MyPlugin(), new MyListener());
+        registry.registerHandler(new MyListener(new MyPlugin()));
 
         MyEvent event = new MyEvent();
         assertFalse(event.successfull);

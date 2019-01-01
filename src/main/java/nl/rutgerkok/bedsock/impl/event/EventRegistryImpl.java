@@ -4,6 +4,7 @@ import static nl.rutgerkok.bedsock.util.NullAnnotation.nullable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -86,11 +87,16 @@ public class EventRegistryImpl implements EventRegistry {
 
     @Override
     public <E extends Event> void registerHandler(ActivePlugin plugin, Class<E> event, Consumer<? super E> handler,
-            EventPriority priority) {
+            EventPriority priority, boolean ignoreCancelled) {
         Handler internalHandler = new Handler(plugin, priority) {
             @SuppressWarnings("unchecked") // Save as long as handler is put in the right list
             @Override
             void run(Event event) {
+                if (ignoreCancelled) {
+                    if (event instanceof Cancellable && ((Cancellable) event).isCancelled()) {
+                        return;
+                    }
+                }
                 try {
                     handler.accept((E) event);
                 } catch (Throwable t) {
@@ -103,11 +109,18 @@ public class EventRegistryImpl implements EventRegistry {
     }
 
     @Override
-    public void registerHandler(ActivePlugin plugin, Listener listener) {
-        for (Method method : listener.getClass().getMethods()) {
+    public void registerHandler(Listener listener) {
+        Class<? extends Listener> listenerClass = listener.getClass();
+        boolean makeAccessible = !Modifier.isPublic(listenerClass.getModifiers());
+        for (Method method : listenerClass.getMethods()) {
             EventHandler annotation = nullable(method.getAnnotation(EventHandler.class));
             if (annotation == null) {
                 continue;
+            }
+
+            // If method is in a private class, make the method visible
+            if (makeAccessible) {
+                method.setAccessible(true);
             }
 
             // Get event handler
@@ -123,7 +136,7 @@ public class EventRegistryImpl implements EventRegistry {
                                 + " must listen to a subclass of Event, but is listening to " + eventType);
             }
 
-            Handler internalHandler = new Handler(plugin, annotation.priority()) {
+            Handler internalHandler = new Handler(listener.getPlugin(), annotation.priority()) {
                 @Override
                 void run(Event event) {
                     if (annotation.ignoreCancelled() && event instanceof Cancellable) {
