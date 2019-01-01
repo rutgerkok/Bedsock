@@ -88,7 +88,7 @@ public final class ConfigObject {
     /**
      * Gets the given int. If no int is stored at the given location, the given
      * default value is stored at that location.
-     * 
+     *
      * @param key
      *            The storage location.
      * @param defaultValue
@@ -105,9 +105,24 @@ public final class ConfigObject {
     }
 
     /**
+     * Gets the object with the given name. If no object exists at the given location, a new object is placed there.
+     * @param key Storage location.
+     * @return The object.
+     */
+    public ConfigObject getOrPlaceObject(String key) {
+        try {
+            return getObject(key);
+        } catch (InvalidConfigException e) {
+            ConfigObject object = new ConfigObject();
+            internal.put(key, object.internal);
+            return object;
+        }
+    }
+
+    /**
      * Gets the given string. If no string is stored at the given location, the
      * default value is stored at that location.
-     * 
+     *
      * @param key
      *            The storage location.
      * @param defaultValue
