@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.jdt.annotation.Nullable;
 
 import nl.rutgerkok.bedsock.command.CommandException;
+import nl.rutgerkok.bedsock.event.wrapper.ServerLaunchEvent;
 import nl.rutgerkok.bedsock.logger.Logger;
 
 import picocli.CommandLine;
@@ -49,6 +50,8 @@ public class StartServer implements Callable<@Nullable Void> {
 
         BufferedReader outputOfProcess = new BufferedReader(new InputStreamReader(process.getInputStream()));
         ActiveServerImpl server = new ActiveServerImpl(process.getOutputStream(), inactiveServer);
+
+        server.getEventRegistry().callEvent(new ServerLaunchEvent(server));
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
